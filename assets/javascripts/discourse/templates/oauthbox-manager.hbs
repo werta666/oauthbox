@@ -1,0 +1,399 @@
+<div class="oauthbox-manager">
+  <div class="oauthbox-manager-header">
+    <h2>{{i18n "oauthbox.manager.title"}}</h2>
+    <DButton
+      @action={{this.showAddModal}}
+      @label="oauthbox.manager.add_provider"
+      @icon="plus"
+      class="btn-primary"
+    />
+  </div>
+
+  <div class="oauthbox-manager-content">
+    {{#if this.loading}}
+      <div class="oauthbox-loading">
+        <span class="loading-spinner"></span>
+        <span>{{i18n "oauthbox.manager.loading"}}</span>
+      </div>
+    {{else}}
+      {{#if this.providers.length}}
+        <table class="oauthbox-providers-table">
+          <thead>
+            <tr>
+              <th>{{i18n "oauthbox.manager.table.position"}}</th>
+              <th>{{i18n "oauthbox.manager.table.name"}}</th>
+              <th>{{i18n "oauthbox.manager.table.button_title"}}</th>
+              <th>{{i18n "oauthbox.manager.table.enabled"}}</th>
+              <th>{{i18n "oauthbox.manager.table.actions"}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each this.sortedProviders as |provider|}}
+              <tr>
+                <td>{{provider.position}}</td>
+                <td>{{provider.name}}</td>
+                <td>{{provider.button_title}}</td>
+                <td>
+                  {{#if provider.enabled}}
+                    <span class="status-badge status-enabled">{{i18n "oauthbox.manager.status.enabled"}}</span>
+                  {{else}}
+                    <span class="status-badge status-disabled">{{i18n "oauthbox.manager.status.disabled"}}</span>
+                  {{/if}}
+                </td>
+                <td class="actions">
+                  <DButton
+                    @action={{fn this.showEditModal provider}}
+                    @label="oauthbox.manager.actions.edit"
+                    @icon="pencil-alt"
+                    class="btn-default"
+                  />
+                  <DButton
+                    @action={{fn this.toggleProvider provider}}
+                    @label={{if provider.enabled "oauthbox.manager.actions.disable" "oauthbox.manager.actions.enable"}}
+                    @icon={{if provider.enabled "pause" "play"}}
+                    class="btn-default"
+                  />
+                  <DButton
+                    @action={{fn this.deleteProvider provider}}
+                    @label="oauthbox.manager.actions.delete"
+                    @icon="trash-alt"
+                    class="btn-danger"
+                  />
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{else}}
+        <div class="oauthbox-empty">
+          <div class="empty-state">
+            <span class="empty-icon">🔐</span>
+            <h3>{{i18n "oauthbox.manager.empty.title"}}</h3>
+            <p>{{i18n "oauthbox.manager.empty.description"}}</p>
+            <DButton
+              @action={{this.showAddModal}}
+              @label="oauthbox.manager.empty.add_first"
+              @icon="plus"
+              class="btn-primary"
+            />
+          </div>
+        </div>
+      {{/if}}
+    {{/if}}
+  </div>
+
+  {{#if this.showModal}}
+    <DModal
+      @closeModal={{this.closeModal}}
+      @title={{if this.editingProvider "oauthbox.modal.edit_title" "oauthbox.modal.add_title"}}
+      class="oauthbox-modal"
+    >
+      <:body>
+        <form class="oauthbox-form">
+          <div class="form-section">
+            <h4>{{i18n "oauthbox.modal.sections.basic"}}</h4>
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.name"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.name}}
+                placeholder={{i18n "oauthbox.modal.placeholders.name"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.button_title"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.button_title}}
+                placeholder={{i18n "oauthbox.modal.placeholders.button_title"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.position"}}</label>
+              <Input
+                @type="number"
+                @value={{this.formData.position}}
+                placeholder={{i18n "oauthbox.modal.placeholders.position"}}
+                class="form-control"
+                min="1"
+              />
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.enabled}}
+                />
+                {{i18n "oauthbox.modal.fields.enabled"}}
+              </label>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>{{i18n "oauthbox.modal.sections.oauth"}}</h4>
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.client_id"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.client_id}}
+                placeholder={{i18n "oauthbox.modal.placeholders.client_id"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.client_secret"}}</label>
+              <Input
+                @type="password"
+                @value={{this.formData.client_secret}}
+                placeholder={{i18n "oauthbox.modal.placeholders.client_secret"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.authorize_url"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.authorize_url}}
+                placeholder={{i18n "oauthbox.modal.placeholders.authorize_url"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.token_url"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.token_url}}
+                placeholder={{i18n "oauthbox.modal.placeholders.token_url"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.token_url_method"}}</label>
+              <select class="form-control" {{on "change" this.updateTokenUrlMethod}}>
+                <option value="GET" selected={{eq this.formData.token_url_method "GET"}}>GET</option>
+                <option value="POST" selected={{eq this.formData.token_url_method "POST"}}>POST</option>
+                <option value="PUT" selected={{eq this.formData.token_url_method "PUT"}}>PUT</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.user_json_url"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.user_json_url}}
+                placeholder={{i18n "oauthbox.modal.placeholders.user_json_url"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.user_json_url_method"}}</label>
+              <select class="form-control" {{on "change" this.updateUserJsonUrlMethod}}>
+                <option value="GET" selected={{eq this.formData.user_json_url_method "GET"}}>GET</option>
+                <option value="POST" selected={{eq this.formData.user_json_url_method "POST"}}>POST</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.scope"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.scope}}
+                placeholder={{i18n "oauthbox.modal.placeholders.scope"}}
+                class="form-control"
+              />
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>{{i18n "oauthbox.modal.sections.advanced"}}</h4>
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.send_auth_header}}
+                />
+                {{i18n "oauthbox.modal.fields.send_auth_header"}}
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.send_auth_body}}
+                />
+                {{i18n "oauthbox.modal.fields.send_auth_body"}}
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.email_verified}}
+                />
+                {{i18n "oauthbox.modal.fields.email_verified"}}
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.overrides_email}}
+                />
+                {{i18n "oauthbox.modal.fields.overrides_email"}}
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.allow_association_change}}
+                />
+                {{i18n "oauthbox.modal.fields.allow_association_change"}}
+              </label>
+            </div>
+
+            <div class="form-group checkbox-group">
+              <label>
+                <Input
+                  @type="checkbox"
+                  @checked={{this.formData.fetch_user_details}}
+                />
+                {{i18n "oauthbox.modal.fields.fetch_user_details"}}
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.callback_user_id_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.callback_user_id_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.callback_user_id_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.json_user_id_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.json_user_id_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.json_user_id_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.json_username_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.json_username_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.json_username_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.json_name_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.json_name_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.json_name_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.json_email_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.json_email_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.json_email_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.json_email_verified_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.json_email_verified_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.json_email_verified_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.json_avatar_path"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.json_avatar_path}}
+                placeholder={{i18n "oauthbox.modal.placeholders.json_avatar_path"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.authorize_signup_url"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.authorize_signup_url}}
+                placeholder={{i18n "oauthbox.modal.placeholders.authorize_signup_url"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.authorize_options"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.authorize_options}}
+                placeholder={{i18n "oauthbox.modal.placeholders.authorize_options"}}
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label>{{i18n "oauthbox.modal.fields.callback_user_info_paths"}}</label>
+              <Input
+                @type="text"
+                @value={{this.formData.callback_user_info_paths}}
+                placeholder={{i18n "oauthbox.modal.placeholders.callback_user_info_paths"}}
+                class="form-control"
+              />
+            </div>
+          </div>
+        </form>
+      </:body>
+
+      <:footer>
+        <DButton
+          @action={{this.saveProvider}}
+          @label={{if this.editingProvider "oauthbox.modal.save" "oauthbox.modal.create"}}
+          @icon="check"
+          class="btn-primary"
+          @disabled={{this.saving}}
+        />
+        <DButton
+          @action={{this.closeModal}}
+          @label="oauthbox.modal.cancel"
+          @icon="times"
+          class="btn-default"
+        />
+      </:footer>
+    </DModal>
+  {{/if}}
+</div>

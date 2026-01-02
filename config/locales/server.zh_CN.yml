@@ -1,0 +1,15 @@
+# WARNING: Never edit this file.
+# It will be overwritten when translations are pulled from Crowdin.
+#
+# To work with us on translations, join this project:
+# https://translate.discourse.org/
+
+zh_CN:
+  login:
+    authenticator_error_fetch_user_details: "无法检索您的用户详细信息。您有活跃帐户吗？"
+  site_settings:
+    oauthbox_enabled: "OAuthbox 已启用"
+    oauthbox_debug_auth: "在日志中包含丰富的调试信息"
+    oauthbox_disable_csrf: "禁用 CSRF 检查"
+  errors:
+    oauthbox_fetch_user_details: "必须存在 oauthbox_callback_user_id_path 才能禁用 oauthbox_fetch_user_details"

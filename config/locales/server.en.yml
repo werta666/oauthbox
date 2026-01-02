@@ -1,0 +1,11 @@
+en:
+  login:
+    authenticator_error_fetch_user_details: "Could not retrieve your user details. Do you have an active account?"
+
+  site_settings:
+    oauthbox_enabled: "Custom OAuth2 is enabled"
+    oauthbox_debug_auth: "Include rich debugging information in your logs"
+    oauthbox_disable_csrf: "Disable CSRF check"
+
+  errors:
+    oauthbox_fetch_user_details: "oauthbox_callback_user_id_path must be present to disable oauthbox_fetch_user_details"

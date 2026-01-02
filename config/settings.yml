@@ -1,0 +1,10 @@
+login:
+  oauthbox_enabled:
+    default: false
+    client: true
+  
+  # Global settings
+  oauthbox_debug_auth: false
+  oauthbox_disable_csrf:
+    default: false
+    hidden: true
